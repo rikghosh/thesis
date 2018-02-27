@@ -27,5 +27,11 @@
 		Discussion on Habits of Fad Dieting
 		Historical Overview of Popular Diets
 	Governmental Dietary Guidelines
+
+## Methods and Visualization
+#### Data Processing
+	Explain the different sources of data and how they are used
+#### Visualization Guide
+	Explain how data are mapped to visual variables 
 	
 ## Conclusion
