@@ -10,6 +10,8 @@ html {
   background: #fcfbf3;
 }
 
+
+
 #title {
   font-family: Garamond;
   font-size: 25px;
@@ -24,11 +26,17 @@ html {
   font-size: 15px;
   position: absolute;
   bottom: 0;
+  width: 90%;
+  margin-left: 50px;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
   
   /*left margin is inducing horizontal scrolling!*/
   /*margin-left: 60px;*/
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 }
+
 
 .line {
   fill: none;
@@ -52,7 +60,7 @@ svg {
 
 <head>
   <title>A CENTURY OF AMERICAN FOOD</title>
-  <link href="https://fonts.googleapis.com/css?family=Archivo+Narrow|Strait" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Archivo+Narrow|Karla|Strait" rel="stylesheet">
 </head>
 
 <body>
@@ -64,9 +72,10 @@ svg {
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
-
+var eventType = "D"
 var eventTitle = "Sample Title"
 var eventDesc = "Sample Description"
+var backcolor = "#fcfbf3";
 var xAxis, yAxis, food, foods, legend;
 var legendValues = "foodgroups"; 
 var legMin, legMax;
@@ -130,7 +139,7 @@ var colors = {
 
 var categories = {
     foodgroups: ["Total Meat", "Total Fats", "Total Veg", "Total Dairy", "Total Fruits", "Grains", "Sugars and Sweeteners", "Nuts and Legumes"],
-    meats: ["Total Meat", "Meat", "Poultry", "Fish"],
+    meats: ["Total Meat", "Red Meat", "Poultry", "Fish"],
     dairy: ["Total Dairy", "Whole Milk", "Lowfat Milk", "Cheese", "Other Dairy"],
     fruits: ["Total Fruits", "Citrus Fruits", "Non-Citrus Fruits"],
     vegetables: ["Total Veg", "White Potato", "Green Leafy Vegetables", "Tomatoes", "Other Veg"],
@@ -235,7 +244,7 @@ function initialize (data, eventdata) {
       .append("text")
         // .attr("x", width/2)
         .attr("x", -15)
-        .attr("y", 65)
+        .attr("y", 70)
         .attr("fill", "#000")
         .text("Year")
 
@@ -247,11 +256,20 @@ function initialize (data, eventdata) {
     .append("text")
       .attr("transform", "rotate(-90)")
       // .attr("x", -height/2)
-      .attr("x", -height + 10)
-      .attr("y", -70)
+      .attr("x", -height - 40)
+      .attr("y", -75)
       .attr("dy", "0.71em")
       .attr("fill", "#000")
-      .text("Percent");
+      .attr("text-anchor", "start")
+      .text("Percent of Total Calories")
+      .on("mouseover", function() {
+        d3.select(this)
+          .text("Percent of Total Calories (per Capita per Day)")
+      })
+      .on("mouseout", function() {
+        d3.select(this)
+          .text("Percent of Total Calories")
+      })
 
   food = chartWrapper.selectAll(".food")
     .data(foods)
@@ -271,7 +289,7 @@ function initialize (data, eventdata) {
       .attr("class", "event")
       
   events.append("text")
-      .attr("x", function(d) { return x(d.Year) + 5 })
+      .attr("x", function(d) { return x(d.Year) + 3 })
       .attr("y", y(d3.max(y.domain())))
       .attr("class", "eventletter")
       .attr("opacity", 0.4)
@@ -282,6 +300,8 @@ function initialize (data, eventdata) {
       .on("mouseover", function(d) {
         if (!eventdetail) {
           d3.select(this)
+            //.transition().duration(50)          
+            .style("font-size", "20px")
             d3.selectAll("#" + d.Id)
               .attr("display", "inline")
             d3.selectAll("#" + d.Id + ":not(.eventtext)")
@@ -293,6 +313,9 @@ function initialize (data, eventdata) {
       
   
       .on("mouseout", function(d) {
+        d3.select(this)
+          .transition().duration(50)
+          .style("font-size", "15px")
         d3.selectAll(".eventtext")
           .attr("display", "none");
         d3.selectAll("#" + d.Id + ":not(.eventtext)")
@@ -301,17 +324,25 @@ function initialize (data, eventdata) {
             .attr("stroke-width", 1)
       })
       
-      .on("mousedown", function(d) {
-        eventdetail = true;
-        d3.selectAll(".eventpane")
-          .attr("display", "inline")
-          // .transition().duration(1000)
-          // .attr("height", height + margin.top + margin.bottom - 140)
-          
+      .on("mouseup", function(d) {
         eventTitle = d.Name;
         eventDesc = d.Summary;
-        eventText.html("<h3 style='font-family: Garamond; letter-spacing: 0.15em; font-weight: normal; font-size; 20px;' >" + eventTitle.toUpperCase() + "</h3> <p style='font-size: 20px' >" + eventDesc + "</p>")
-      })
+        eventImage = d.Image;
+        eventType = d.Type;
+        if (eventType == "G") {
+          eventdetail = true;
+          eventDisp.html("<img style = 'display: block; height: 100%; margin-left: auto; margin-right: auto; outline: 4px solid #3D342E;' src='" + eventImage + "'>")
+          d3.selectAll(".eventpane")
+          .attr("display", "inline")
+          // eventDisp.html("<h3 style='font-family: Garamond; letter-spacing: 0.15em; font-weight: normal; font-size; 20px;' >" + eventTitle.toUpperCase() + "</h3> <img style = 'display: inline; height: 95%; float: right; margin-left: 100px; outline: 5px solid #3D342E;' src='" + eventImage + "'>")
+          // eventDisp.html("<h3 style='font-family: Garamond; letter-spacing: 0.15em; font-weight: normal; font-size; 20px;' >" + eventTitle.toUpperCase() + "</h3> <p><img style='float: right; height: '" + (height + margin.top + margin.bottom) + "px;' src='" + eventImage + "'>" + eventDesc + "</p>")
+        }
+        // else {
+        //   console.log(eventType);
+        //   eventDisp.html("<h3 style='font-family: Garamond; letter-spacing: 0.15em; font-weight: normal; font-size; 20px;' >" + eventTitle.toUpperCase() + "</h3> <p style='font-size: 20px' >" + eventDesc + "</p>")
+        // }
+          
+        })
       
   events.append("line")
     .attr("class", "eventline")
@@ -325,25 +356,25 @@ function initialize (data, eventdata) {
     .attr("stroke-width", 1)
     .attr("stroke", "black")
     
-    .on("mouseover", function(d) {
-      if (!eventdetail) {
-        d3.selectAll("#" + d.Id)
-          .attr("display", "inline")
-        d3.selectAll("#" + d.Id + ":not(.eventtext)")
-          .style("font-weight", "bold")
-          .attr("opacity", 0.5)
-          .attr("stroke-width", 2)
-      }
-    })
+    // .on("mouseover", function(d) {
+    //   if (!eventdetail) {
+    //     d3.selectAll("#" + d.Id)
+    //       .attr("display", "inline")
+    //     d3.selectAll("#" + d.Id + ":not(.eventtext)")
+    //       .style("font-weight", "bold")
+    //       .attr("opacity", 0.5)
+    //       .attr("stroke-width", 2)
+    //   }
+    // })
 
-    .on("mouseout", function(d) {
-      d3.selectAll(".eventtext")
-        .attr("display", "none");
-      d3.selectAll("#" + d.Id + ":not(.eventtext)")
-          .style("font-weight", "normal")
-          .attr("opacity", 0.4)
-          .attr("stroke-width", 1)
-    })
+    // .on("mouseout", function(d) {
+    //   d3.selectAll(".eventtext")
+    //     .attr("display", "none");
+    //   d3.selectAll("#" + d.Id + ":not(.eventtext)")
+    //       .style("font-weight", "normal")
+    //       .attr("opacity", 0.4)
+    //       .attr("stroke-width", 1)
+    // })
     
     // .on("mousedown", function(d) {
     //   eventdetail = true;
@@ -353,27 +384,34 @@ function initialize (data, eventdata) {
     
     
     events.append("foreignObject")
-      .attr("x", function(d) { return x(d.Year) + 5 })
-      .attr("y", y(d3.max(y.domain())))
-      .attr("width", 200)
+      .attr("x", function(d) { 
+        if (d.Year > 1980) {
+          return x(d.Year) - 410
+        }
+        else {
+          return x(d.Year) + 5
+        }
+      })
+      // .attr("y", y(d3.max(y.domain())))
+      .attr("y", 20)
+      .attr("width", 400)
       .attr("height", 500)
       //.style("background", "lightgray")
       .style("margin-top", 0)
       .style("padding-left", 10)
       .attr("class", "eventtext")
       .attr("id", function(d) { return d.Id })
-      .style("font", "14px Archivo Narrow")
+      .style("font", "16px Archivo Narrow")
+      .style("text-align", function(d) {
+        if (d.Year > 1980) {
+          return "right"
+        }
+        else {
+          return "left"
+        }
+      })
       .attr("display", "none")
-      .html(function(d) { return "<h3>" + d.Name + "</h3> <p>" + d.Summary + "</p>"})
-    
-    // events.append("text")
-    //   .attr("x", function(d) { return x(d.Year) + 5 })
-    //   .attr("y", y(d3.max(y.domain())) + 10)
-    //   .attr("class", "eventtext")
-    //   .attr("id", function(d) { return d.Id })
-    //   .style("font", "11px Archivo Narrow")
-    //   .attr("display", "none")
-    //   .text(function(d) { return d.Name })
+      .html(function(d) { return "<h3 style='font-family: Garamond; font-weight: normal; font-size: 20px; letter-spacing: 0.22em;'>" + d.Name.toUpperCase() + "</h3> <p style='font-family: Karla; letter-spacing: 0em; '>" + d.Summary + "</p>"})
     
 
   updateLegend();
@@ -387,8 +425,9 @@ function initialize (data, eventdata) {
           .style("display", "none")
         d3.selectAll(".foodgroups")
           .style("display", "inline")
+        backcolor = "#fcfbf3"
         d3.select("html")
-          .style("background", "#fcfbf3")
+          .style("background", backcolor)
         d3.selectAll(".area")
           .style("display", "none")
         d3.select("#category").remove()
@@ -408,6 +447,11 @@ function initialize (data, eventdata) {
           d3.max(foods, function(c) { return d3.max(c.values, function(d) { return d.percent + 1; }); })
         ]);
         render();
+      }
+      if (eventdetail) {
+        eventdetail = false;
+        d3.selectAll(".eventpane")
+          .attr("display", "none")
       }
     })
     
@@ -454,7 +498,7 @@ function initialize (data, eventdata) {
   .style("display", "none")
   .style("opacity", 0.2)
   .style("fill", function(d) { return d.color })
-  .style("pointer-events", "none")
+  .style("pointer-events", "none");
 
 
   // draw lines for each food
@@ -462,7 +506,6 @@ function initialize (data, eventdata) {
       .classed("line", true)
       .attr("id", function(d) { return d.id.replace(/\s+/g, '') })
       .attr("d", function(d) { return line(d.values); })
-      //.style("stroke", function(d) { return z(d.id); })
       .style("stroke", function(d) { return d.color })
       .on("mouseover", function(d) {
         if (!detail) {
@@ -476,7 +519,6 @@ function initialize (data, eventdata) {
               .style("opacity", 0.7)
               .classed("temp", true)
           }
-          // foods = foods.filter(function(d) { return d.id == "Meat" || d.id == "Total Fats" || d.id == "Total Veg" || d.id == "Total Dairy" || d.id == "Total Fruits" });
           if (d3.select(this.parentNode).attr("class").includes("foodgroups"))
             d3.select(this)
             .style("stroke-width", 3);
@@ -530,7 +572,7 @@ function initialize (data, eventdata) {
           d3.selectAll(".temp")
               .classed("temp", false)
           y.domain([fromScale, toScale])
-          var backcolor = d3.color(d.color)
+          backcolor = d3.color(d.color)
           backcolor.opacity = 0.15
           d3.select("html")
             .style("background", backcolor)
@@ -545,15 +587,6 @@ function initialize (data, eventdata) {
       }
       })
 
-  // food.append("text")
-  //     .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
-  //     .classed("label", true)
-  //     .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.percent) + ")"; })
-  //     .attr("x", 3)
-  //     .attr("dy", "0.35em")
-  //     .style("font", "14px Archivo Narrow")
-  //     .text(function(d) { return d.id; });
-      
 
   
     // show x and y values of mouse position on axes
@@ -576,7 +609,7 @@ function initialize (data, eventdata) {
           .style("font", "14px Archivo Narrow")
           .style("alignment-baseline", "middle")
           .style("text-anchor", "end")
-          .style("fill", "#DBD9CE")
+          .style("fill", "#A39B77")
           .text(yval)
       }
       //&& yval >= y(d3.min(y.domain())) && yval <= d3.max(y.domain()) 
@@ -588,41 +621,43 @@ function initialize (data, eventdata) {
           //.attr("fill", "#000")
           .style("font", "14px Archivo Narrow")
           .style("text-anchor", "middle")
-          .style("fill", "#DBD9CE")
+          .style("fill", "#A39B77")
           .text(xval)
       }
 
     });
     
-  svg.append("rect")
-    .classed("eventpane", true)
-    .attr("x", 300)
-    .attr("y", 50)
-    .attr("height", height + margin.top + margin.bottom - 140)
-    .attr("width", width + margin.left + margin.right - 600)
-    .attr("fill", "#675E59")
-    .attr("opacity", 0.9)
-    .attr("display", "none")
-    .on("mouseup", function() {
-      eventdetail = false;
-      d3.selectAll(".eventpane")
-        .attr("display", "none")
-        // .transition().duration(1000)
-        // .attr("height", 0)
+  // svg.append("rect")
+  //   .classed("eventpane", true)
+  //   // .attr("x", 300)
+  //   // .attr("y", 50)
+  //   // .attr("height", height + margin.top + margin.bottom - 140)
+  //   // .attr("width", width + margin.left + margin.right - 600)
+  //   // .attr("x", 0)
+  //   // .attr("y", 30)
+  //   // .attr("height", window.innerHeight)
+  //   // .attr("width", window.innerWidth - 40)
+  //   .attr("fill", "#675E59")
+  //   .attr("opacity", 0.9)
+  //   .attr("display", "none")
+  //   .on("mouseup", function() {
+  //     eventdetail = false;
+  //     d3.selectAll(".eventpane")
+  //       .attr("display", "none")
+  //       // .transition().duration(1000)
+  //       // .attr("height", 0)
         
-      console.log(eventTitle)
-    })
+  //     console.log(eventTitle)
+  //   })
     
-  var eventText = svg.append("foreignObject")
+  var eventDisp = svg.append("foreignObject")
     .classed("eventpane", true)
     .attr("x", 350)
     .attr("y", 50)
-    .attr("width", (width + margin.left + margin.right - 600 - 50)/2)
+    .attr("width", width + margin.left + margin.right - 600 - 50)
     .attr("height", height + margin.top + margin.bottom - 140 - 50)
     .style("color", "white")
     .style("fill", "white")
-    // .style("margin-top", 0)
-    // .style("padding-left", 10)
     .style("font", "28px Archivo Narrow")
     .html("<h3>" + eventTitle.toUpperCase() + "</h3> <p>" + eventDesc + "</p>")
     .attr("display", "none")
@@ -632,6 +667,7 @@ function initialize (data, eventdata) {
         .attr("display", "none")
       console.log(eventTitle)
     })
+    
     
   
   render();
@@ -666,10 +702,6 @@ function render () {
     .transition().duration(1000)
     .call(yAxis);
     
-  svg.selectAll('.label')
-    .transition().duration(1000)
-    .attr("transform", function(d) { rand = Math.random()*20 - 10; return "translate(" + x(d.value.date) + "," + y(d.value.percent) + ")"; })
-    
   svg.selectAll('.area')
     .transition().duration(1000)
     .attr('d', function(d) { return area(d.values); })
@@ -689,13 +721,21 @@ function render () {
     
   svg.selectAll('.eventletter')
     .transition().duration(1000)
-    .attr("x", function(d) { return x(d.Year) + 5 })
+    .attr("x", function(d) { return x(d.Year) + 3 })
     .attr("y", y(d3.max(y.domain())))
   
   svg.selectAll('.eventtext')
     .transition().duration(1000)
-    .attr("x", function(d) { return x(d.Year) + 5 })
-    .attr("y", y(d3.max(y.domain())))
+    .attr("x", function(d) { 
+      if (d.Year > 1980) {
+        return x(d.Year) - 410
+      }
+      else {
+        return x(d.Year) + 5
+      }
+    })
+    // .attr("y", y(d3.max(y.domain())))
+    .attr("y", 20) 
     
   
 }
@@ -707,18 +747,49 @@ function updateLegend() {
   var legScale = d3.scaleLinear().range([legMin, legMax]).domain([0, 1])
   console.log(legScale(5))
   
-  legend = d3.select("#legend").append("svg")
-    .attr("class", "legitem")
-    .attr("width", window.innerWidth)
-    .attr("height", 100)
+  // legend = d3.select("#legend").append("svg")
+  //   .attr("class", "legitem")
+  //   .attr("width", window.innerWidth)
+  //   .attr("height", 100)
 
 
   console.log(foods.filter(function(d) { return d.id == "Total Meat"})[0].color)
   
-  var legitem = legend.selectAll(".legitem")
-  .data(categories[legendValues])
-  .enter().append("g")
   
+  // var legitem = legend.selectAll(".legitem")
+  // .data(categories[legendValues])
+  // .enter().append("g")
+  
+  d3.select("#legend").selectAll(".legitem")
+    .data(categories[legendValues])
+    .enter().append("input")
+      .attr("type","button")
+      .classed("button", "true")
+      .classed("legitem", "true")
+      .style("font-size", "16px")
+      .style("color", function(d) { return foods.filter(function(c) { return c.id == d })[0].color })
+      .style("border", "none")
+      .style("letter-spacing", "0.1em")
+      .style("background", "#00000000")
+      // .style("position", "relative")
+      // .style("left", "50%")
+      .style("font-family", "Archivo Narrow")
+      .attr("value", function (d) { return d } )
+      .on("mouseover", function (d) {
+        d3.selectAll("#" + d.replace(/\s+/g, ''))
+          .style("display", "inline-block")
+          .style("stroke-width", 3)
+          .style("text-decoration", "underline")
+      })
+      
+      .on("mouseout", function (d) {
+        d3.selectAll("#" + d.replace(/\s+/g, ''))
+          .style("stroke-width", 1.5)
+          .style("text-decoration", "none")
+          d3.selectAll(".area")
+            .style("display", "none")
+      })
+    
   
   // legend.append("rect")
   //   .attr("x", function(d, i) { return 10*i })
@@ -727,32 +798,31 @@ function updateLegend() {
   //   .attr("height", 10)
   //   .attr("fill", "red")
   
-  legitem.append("text")
-    .text(function(d) { return d })
-    .attr("id", function(d) { return d.replace(/\s+/g, '') })
-    .attr("text-anchor", "middle")
-    .attr("x", function(d,i) { return legScale((i + 1)/(numItems + 1)) + 60 })
-    .attr("y", 60)
-    .attr("padding-left", 20)
-    .attr("padding-right", 20)
-    // .style("fill", function(d) { foods.filter(function(c) { console.log(c.id == d); return c.id == d })[0].color })
-    .style("fill", function(d) { return foods.filter(function(c) { return c.id == d })[0].color })
+  // legitem.append("text")
+  //   .text(function(d) { return d })
+  //   .attr("id", function(d) { return d.replace(/\s+/g, '') })
+  //   .attr("text-anchor", "middle")
+  //   .attr("x", function(d,i) { return legScale((i + 1)/(numItems + 1)) + 60 })
+  //   .attr("y", 60)
+  //   .attr("padding-left", 20)
+  //   .attr("padding-right", 20)
+  //   // .style("fill", function(d) { foods.filter(function(c) { console.log(c.id == d); return c.id == d })[0].color })
+  //   .style("fill", function(d) { return foods.filter(function(c) { return c.id == d })[0].color })
     
-    .on("mouseover", function (d) {
-      d3.selectAll("#" + d.replace(/\s+/g, ''))
-        .style("display", "inline")
-        .style("stroke-width", 3)
-        .style("text-decoration", "underline")
-    })
+  //   .on("mouseover", function (d) {
+  //     d3.selectAll("#" + d.replace(/\s+/g, ''))
+  //       .style("display", "inline")
+  //       .style("stroke-width", 3)
+  //       .style("text-decoration", "underline")
+  //   })
     
-    .on("mouseout", function (d) {
-      d3.selectAll("#" + d.replace(/\s+/g, ''))
-        .style("stroke-width", 1.5)
-        .style("text-decoration", "none")
-        d3.selectAll(".area")
-          .style("display", "none")
-        
-    })
+  //   .on("mouseout", function (d) {
+  //     d3.selectAll("#" + d.replace(/\s+/g, ''))
+  //       .style("stroke-width", 1.5)
+  //       .style("text-decoration", "none")
+  //       d3.selectAll(".area")
+  //         .style("display", "none")
+  //   })
   
 }
 
