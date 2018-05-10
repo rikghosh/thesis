@@ -766,20 +766,20 @@ function updateLegend() {
       .attr("type","button")
       .classed("button", "true")
       .classed("legitem", "true")
+      .attr("color", function(d) { return foods.filter(function(c) { return c.id == d })[0].color })
+      // .attr("id", function(d) { d.replace(/\s+/g, '') })
       .style("font-size", "16px")
       .style("color", function(d) { return foods.filter(function(c) { return c.id == d })[0].color })
       .style("border", "none")
       .style("letter-spacing", "0.1em")
       .style("background", "#00000000")
-      // .style("position", "relative")
-      // .style("left", "50%")
       .style("font-family", "Archivo Narrow")
       .attr("value", function (d) { return d } )
       .on("mouseover", function (d) {
         d3.selectAll("#" + d.replace(/\s+/g, ''))
           .style("display", "inline-block")
           .style("stroke-width", 3)
-          .style("text-decoration", "underline")
+          .style("font-size", "20px")
       })
       
       .on("mouseout", function (d) {
@@ -788,6 +788,44 @@ function updateLegend() {
           .style("text-decoration", "none")
           d3.selectAll(".area")
             .style("display", "none")
+      })
+      
+      .on("mouseup", function(d) {
+        if (!detail) {
+          d3.selectAll("#" + d.replace(/\s+/g, ''))
+          .style("stroke-width", 1.5)
+          .style("text-decoration", "none")
+          d3.selectAll(".area")
+            .style("display", "none")
+          detail = true;
+          var toDisplay = classify(d)[1]
+          legendValues = toDisplay
+          updateLegend();
+          
+          var fromScale = d3.min(d3.selectAll("." + toDisplay).data().map(function(d) { return d3.min(d.values, function(c) { return c.percent })}))
+          var toScale = d3.max(d3.selectAll("." + toDisplay).data().map(function(d) { return d3.max(d.values, function(c) { return c.percent })}))
+          console.log(d3.min(d3.selectAll("." + toDisplay).data().map(function(d) { return d3.min(d.values, function(c) { return c.percent })})))
+          console.log(toScale);
+          
+          d3.selectAll(".food")
+            .style("display", "none");
+          d3.selectAll("." + toDisplay)
+            .style("display", "inline")
+            .style("opacity", 1)
+          d3.selectAll(".temp")
+              .classed("temp", false)
+          y.domain([fromScale, toScale])
+          backcolor = d3.color(d3.select(this).attr("color"))
+          backcolor.opacity = 0.15
+          d3.select("html")
+            .style("background", backcolor)
+          render();
+          d3.select("#category").remove()
+          d3.select("#title").append("text")
+            .text(toDisplay.toUpperCase())
+            .attr("id", "category")
+            .style("color", d.color)
+      }
       })
     
   
