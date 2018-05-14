@@ -138,11 +138,11 @@ var colors = {
 
 
 var categories = {
-    foodgroups: ["Total Meat", "Total Fats", "Total Veg", "Total Dairy", "Total Fruits", "Grains", "Sugars and Sweeteners", "Nuts and Legumes"],
+    foodgroups: ["Total Meat", "Total Fats", "Total Vegetables", "Total Dairy", "Total Fruits", "Grains", "Sugars and Sweeteners", "Nuts and Legumes"],
     meats: ["Total Meat", "Red Meat", "Poultry", "Fish"],
     dairy: ["Total Dairy", "Whole Milk", "Lowfat Milk", "Cheese", "Other Dairy"],
     fruits: ["Total Fruits", "Citrus Fruits", "Non-Citrus Fruits"],
-    vegetables: ["Total Veg", "White Potato", "Green Leafy Vegetables", "Tomatoes", "Other Veg"],
+    vegetables: ["Total Vegetables", "White Potato", "Green Leafy Vegetables", "Tomatoes", "Other Vegetables"],
     fats: ["Total Fats", "Butter", "Margarine", "Shortening", "Lard and Tallow", "Vegetable Oils"],
     sugars: ["Sugars and Sweeteners"],
     grains: ["Grains"],
@@ -530,6 +530,9 @@ function initialize (data, eventdata) {
         d3.selectAll("#" + d.id.replace(/\s+/g, ''))
         .style("stroke-width", 3)
         .style("text-decoration", "underline")
+        
+        // console.log(d3.selectAll(".button").filter(function(c) { return c.value == d.id; }))
+
           
       })
       
@@ -780,6 +783,7 @@ function updateLegend() {
           .style("display", "inline-block")
           .style("stroke-width", 3)
           .style("font-size", "20px")
+        
       })
       
       .on("mouseout", function (d) {
@@ -824,7 +828,7 @@ function updateLegend() {
           d3.select("#title").append("text")
             .text(toDisplay.toUpperCase())
             .attr("id", "category")
-            .style("color", d.color)
+            .style("color", d3.select(this).attr("color"))
       }
       })
     
