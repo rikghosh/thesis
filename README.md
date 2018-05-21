@@ -5,7 +5,13 @@
  [![screenshot](preview.png)](http://rikghosh.github.io/thesis)
  
  ### Features
- 
+
+Each colored line displays data for an aggregate food group.  Click on any of the lines or legend labels to view more granular data about the food group.
+
+Each dashed line represents a particular historical event, labeled with letters G for Federal Dietary Guides, D for Diet Trends, R for Research Studies, or H for Economic or Political Events. Hover over any of the letters to see information about the corresponding event, and click on any of the "G" letters to see a picture of the relevant food guide. 
+
+Double click on any point on the chart to zoom to a decade surrounding that point.
+
  
  
  ### Abstract
