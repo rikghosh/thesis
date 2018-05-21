@@ -15,7 +15,10 @@ Tracking this over a span of 100 years, the visualization consists of a timeline
 
 ### Creators
 
-Rik Ghosh, with help from Daniel Sauter, Aaron Hill, Christian Swinehart, and the Parsons MS Data Visualization 2018 cohort 
+Rik Ghosh, with help from Daniel Sauter, Aaron Hill, Christian Swinehart, and the Parsons 2018 MSDV cohort.
 
 ### More Screenshots
-[![screenshot](1.png)]
+![screenshot](1.png)
+![screenshot](2.png)
+![screenshot](3.png)
+![screenshot](4.png)
